@@ -68,7 +68,12 @@ namespace forgeSample.Controllers
         /// </summary>
         public static string GetAppSetting(string settingKey)
         {
-            return Environment.GetEnvironmentVariable(settingKey);
+            string ret = Environment.GetEnvironmentVariable(settingKey);
+            if (string.IsNullOrEmpty(ret))
+            {
+                Console.WriteLine("No Client ID");
+            }
+            return ret;
         }
     }
 }

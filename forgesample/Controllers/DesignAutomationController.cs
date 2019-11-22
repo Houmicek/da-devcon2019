@@ -655,7 +655,7 @@ namespace forgeSample.Controllers
                     viewableStream.CopyTo(fileFile);
                 }
 
-                await _hubContext.Clients.Client(id).SendAsync("onDrawing", "");
+                await _hubContext.Clients.Client(id).SendAsync("onDrawing", viewable);
 
             }
             catch (Exception e) 
@@ -901,7 +901,7 @@ namespace forgeSample.Controllers
                     return Ok();
                 }
 
-                await _hubContext.Clients.Client(id).SendAsync("onDownloadLinkComplete", outputFileName);
+                await _hubContext.Clients.Client(id).SendAsync("onDownloadSatComplete", outputFileName);
 
                 // start Sat2Rfa Workitem
                 // basic input validation
@@ -1003,7 +1003,7 @@ namespace forgeSample.Controllers
                 JToken jvalue;
                 if(bodyJson.TryGetValue("status", out jvalue) && jvalue.ToString().Equals("success"))
                 {
-                    await _hubContext.Clients.Client(id).SendAsync("onDownloadLinkComplete", outputFileName);
+                    await _hubContext.Clients.Client(id).SendAsync("onDownloadRfaComplete", outputFileName);
                 }
             }
             catch (Exception e)

@@ -53,9 +53,17 @@
 
         .viewer {
             background-color: white;
-            height: 800px;
-            width: 85%;
+            height: 900px;
+            width: 900px;
             position: relative;
+        }
+
+        .log {
+            background-color: #E7EAED;
+            height: 900px;
+            width: 700px;
+            left: 1200px;
+            position: fixed;
         }
 
         hr {
@@ -71,7 +79,7 @@
     </style>
 </head>
 
-<body style="height: 100%;">
+<body >
     <!-- Fixed navbar by Bootstrap: https://getbootstrap.com/examples/navbar-fixed-top/ -->
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container-fluid">
@@ -113,15 +121,12 @@
                 <!--<center><button class="btn btn-primary" id="startUpdateModel">Update model</button></center><br />-->
             </div>
             <div class="viewer column">
-                <div class="row">
+                <div class="row" style="height: 200px">
                     <ul class="nav nav-tabs" id="pills-tab" role="tablist">
-                        <li class="nav-item active">
-                            <a class="nav-link active" id="pills-log-tab" data-toggle="tab" href="#pills-log"
-                               role="tab" aria-controls="pills-log" aria-selected="true">Log</a>
-                        </li>
+
                         <li class="nav-item">
                             <a class="nav-link" id="pills-3d-model-tab" data-toggle="tab" href="#pills-3d-model"
-                               role="tab" aria-controls="pills-activities" aria-selected="false">Model</a>
+                               role="tab" aria-controls="pills-3d-model" aria-selected="false">Model</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" id="pills-bom-tab" data-toggle="tab" href="#pills-bom"
@@ -136,15 +141,7 @@
                                role="tab" aria-controls="pills-downloads" aria-selected="false">Downloads</a>
                         </li>
                     </ul>
-                    <div class="tab-content" id="pills-tablog">
-                        <div class="tab-pane active in" id="pills-log" role="tabpanel" aria-labelledby="pills-log-tab">
-                            <div class="col-sm-8">
-                                <br />
-                                <button class="btn btn-primary" id="clearLog">Clear Log</button></>
-                                <hr />
-                                <pre id="outputlog" style="height: calc(100vh - 120px);; overflow-y: scroll;"></pre>
-                            </div>
-                        </div>
+                    <div class="tab-content">
                         <div class="tab-pane" id="pills-3d-model" role="tabpanel" aria-labelledby="pills-3d-model-tab">
                             <div>
                                 <div>
@@ -155,6 +152,7 @@
                                 <div id="ModelDiv"></div>
                             </div>
                         </div>
+                        
                         <div class="tab-pane" id="pills-bom" role="tabpanel" aria-labelledby="pills-bom-tab">
                             <div>
                                 <div>
@@ -178,6 +176,7 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="tab-pane" id="pills-drawing" role="tabpanel" aria-labelledby="pills-drawing-tab">
                             <div>
                                 <div>
@@ -188,26 +187,43 @@
                                 <div id="DrawingDiv"></div>
                             </div>
                         </div>
+                        
                         <div class="tab-pane" id="pills-downloads" role="tabpanel" aria-labelledby="pills-downloads-tab">
                             <div>
+                                <br />
+                                <button class="btn btn-primary" id="startRfaDownload">Get RFA</button></>
                                 <hr />
-                                <div id="InventorDownloadDiv"></div>
-                                <div id="DrawingDownloadDiv"></div>
-                                <div id="BomDownloadDiv"></div>
-                                <div id="PdfDownloadDiv"></div>
-                                <div id="RfaDownloadDiv">
-                                    <br />
-                                    <button class="btn btn-primary" id="startRfaDownload">Get RFA</button></>
-                                    <hr />
-                                </div>
                             </div>
-                        </div>
-                    </div>
-                    
-                </div>
 
+                            <div>
+
+                                <div>Assembly: <span id="InventorDownloadDiv"></span></div>
+                                <div>Drawing:<span id="DrawingDownloadDiv"></span></div>
+                                <div>BOM:<span id="BomDownloadDiv"></span></div>
+                                <div>PDF:<span id="PdfDownloadDiv"></span></div>
+                                <div>SAT:<span id="SatDownloadDiv"></span></div>
+                                <div>RFA:<span id="RfaDownloadDiv"></span></div>
+
+                             </div>
+                        </div>
+
+                    </div>
+                </div>
             </div>
+
+            <!-- Report log area -->
+
+            <div class="log">
+                <button class="btn btn-primary" id="clearLog" style="top: 5px; left: 5px;position: relative;">Clear Log</button></>
+                <button class="btn btn-primary" id="copyLog" style="top: 5px; left: 515px;position: relative;">Copy Log</button></>
+                <textarea id="outputlog" style="top: 10px; left: 5px;height: 850px; width: 690px;overflow-y: scroll;position: relative;"></textarea>
+            </div>
+
+
+
         </div>
+    </div>
+
         <!-- Modal Define AppBundle & Activity -->
         <div class="modal fade" id="defineActivityModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">

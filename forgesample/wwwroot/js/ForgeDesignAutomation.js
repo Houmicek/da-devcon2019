@@ -28,6 +28,7 @@ $(document).ready(function () {
 	$('#startUpdateDrawing').click(startUpdateDrawing);
 	$('#startRfaDownload').click(startRfaDownload);
     $('#clearLog').click(clearLog);
+    $('#copyLog').click(copyLog);
 
     $('#pills-tab a').on('click', function (e) {
         e.preventDefault()
@@ -47,6 +48,14 @@ function prepareLists() {
 
 function clearLog() {
     $('#outputlog').html('');
+}
+
+function copyLog() {
+    var $temp = $("<textarea>");
+    $("body").append($temp);
+    $temp.text($('#outputlog').text()).select();
+    document.execCommand('copy');
+    $temp.remove();
 }
 
 function list(control, endpoint) {
@@ -191,11 +200,11 @@ function startUpdateBOM() {
     $('#bomTableBody').html('');
 
     startConnection(function () {
-        var file = 'result.zip';
+        var file = $('#inputFile').val();
         var projectPath = $('#projectPath').val();
         var documentPath = $('#documentPath').val();
         var updateData = {
-            'file': 'result.zip',
+            'file': file,
             'projectPath': projectPath,
             'documentPath': documentPath,
             browerConnectionId: connectionId
@@ -220,8 +229,8 @@ function startUpdateDrawing() {
 	clearLog();
 	//$('#bomTableBody').html('');
 
-	startConnection(function () {
-		var file = 'result.zip';
+    startConnection(function () {
+        var file = $('#inputFile').val();
 		var projectPath = $('#projectPath').val();
 		var documentPath = $('#documentPath').val();
 		var updateData = {
@@ -275,25 +284,27 @@ function startRfaDownload() {
 }
 
 function writeLog(text) {
-    $('#outputlog').append('<div style="border-top: 1px dashed #C0C0C0">' + text + '</div>');
-    var elem = document.getElementById('outputlog');
+    //$('#outputlog').append('<div style="border-top: 1px dashed #C0C0C0">' + text + '</div>');
+    $('#outputlog').append(text + '\n');
+    var elem = $('#outputlog')
     elem.scrollTop = elem.scrollHeight;
 }
 
 function updateParameters(message) {
     var parameters = $('#parameters');
-    //parameters.html('');
+    parameters.html('');
 
     let json = JSON.parse(message);
     for (let key in json) {
         let item = json[key];
         let id = `parameters_${key}`;
 
+
         if (item.values && item.values.length > 0) {
             parameters.append($(`
         <div class="form-group">
-          <label for="${id}">${key}</label>
-          <select class="form-control" id="${id}"></select>
+            <label for="${id}">${key}</label>
+            <select class="form-control" id="${id}"></select>
         </div>`));
             let select = $(`#${id}`);
             for (let key2 in item.values) {
@@ -305,19 +316,19 @@ function updateParameters(message) {
         } else if (item.unit === "Boolean") {
             parameters.append($(`
         <div class="form-group">
-          <label for="${id}">${key}</label>
-          <select class="form-control" id="${id}">
+            <label for="${id}">${key}</label>
+            <select class="form-control" id="${id}">
             <option value="True">True</option>
             <option value="False">False</option>
-          </select>
+            </select>
         </div>`));
             let select = $(`#${id}`);
             select.val(item.value);
         } else {
             parameters.append($(`
         <div class="form-group">
-          <label for="${id}">${key}</label>
-          <input type="text" class="form-control" id="${id}" placeholder="Enter new ${key} value">
+            <label for="${id}">${key}</label>
+            <input type="text" class="form-control" id="${id}" placeholder="Enter new ${key} value">
         </div>`));
             let input = $(`#${id}`);
             input.val(item.value);
@@ -370,7 +381,15 @@ function startConnection(onReady) {
 
 	connection.on("onDownloadLinkComplete", function (message) {
 		addDownloadLink(message);
-	});
+    });
+
+    connection.on("onDownloadSatComplete", function (message) {
+        addDownloadSatLink(message);
+    });
+
+    connection.on("onDownloadRfaComplete", function (message) {
+        addDownloadRfaLink(message);
+    });
 }
 
 
@@ -440,6 +459,54 @@ function addDownloadLink(message) {
 	});
 }
 
+function addDownloadSatLink(message) {
+    writeLog('Download link for: ' + message + ' ready');
+
+    // Add the signed url to the download tab
+    var signedData = {
+        'file': message,
+        'browerConnectionId': connectionId
+    };
+
+    var signedDataStr = JSON.stringify(signedData);
+
+    $.ajax({
+        url: 'api/forge/signedurl',
+        data: signedDataStr,
+        contentType: 'application/json',
+        method: 'POST',
+        success: function (res) {
+            var downloadDiv = '#SatDownloadDiv';
+            $(downloadDiv).html('');
+            updateDownloadElement(downloadDiv, res.signedurl, message);
+        }
+    });
+}
+
+function addDownloadRfaLink(message) {
+    writeLog('Download link for: ' + message + ' ready');
+
+    // Add the signed url to the download tab
+    var signedData = {
+        'file': message,
+        'browerConnectionId': connectionId
+    };
+
+    var signedDataStr = JSON.stringify(signedData);
+
+    $.ajax({
+        url: 'api/forge/signedurl',
+        data: signedDataStr,
+        contentType: 'application/json',
+        method: 'POST',
+        success: function (res) {
+            var downloadDiv = '#RfaDownloadDiv';
+            $(downloadDiv).html('');
+            updateDownloadElement(downloadDiv, res.signedurl, message);
+        }
+    });
+}
+
 function updateDrawing(message) {
     writeLog(message);
 
@@ -449,6 +516,27 @@ function updateDrawing(message) {
 
     // Launch the viewer with the result viewable
     launch2dViewer("viewables/result.pdf");
+
+    // Add the signed url to the download tab
+    var signedData = {
+        'file': message,
+        'browerConnectionId': connectionId
+    };
+
+    var signedDataStr = JSON.stringify(signedData);
+
+    $.ajax({
+        url: 'api/forge/signedurl',
+        data: signedDataStr,
+        contentType: 'application/json',
+        method: 'POST',
+        success: function (res) {
+            var downloadDiv = '#DrawingDownloadDiv';
+            $(downloadDiv).html('');
+            updateDownloadElement(downloadDiv, res.signedurl, message);
+        }
+    });
+
 }
 
 function updateBom(message) {
